@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn
 import  matplotlib.pyplot as plt
@@ -6,9 +7,9 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.module = nn.Sequential(
                         nn.Flatten(),
-                        nn.Linear(1, 512),
+                        nn.Linear(1, 128),
                         nn.ReLU(),
-                        nn.Linear(512, 1))
+                        nn.Linear(128, 1))
 
     def forward(self, x):
         x = self.module(x)
@@ -21,12 +22,13 @@ plt.figure()
 
 # 这里实现一个线性回归
 net = MLP()
-x = torch.reshape(torch.range(1, 28), (28, 1))
-y = 20*x+20+torch.rand(size=(28, 1))*20
-epoch = 10000  # 十次训练次数
+x = torch.arange(0, 2*np.pi, 0.1).reshape(-1, 1)
+y = torch.sin(x)#+20+torch.rand(size=(28, 1))*20
+epoch = 20000  # 十次训练次数
 lr = 0.0001  # 学习率
 optimzer = torch.optim.Adam((net.parameters()),lr=lr)#SGD(net.parameters(),lr=lr)  #设置优化器
 loss_function = nn.MSELoss()
+
 for i in range(1,epoch+1):
 
     output = net(x)
@@ -40,11 +42,11 @@ for i in range(1,epoch+1):
 
 torch.save(net.state_dict(),"线性回归.pth")
 
-
 with torch.no_grad():
     plt.scatter(x, y, color="black")
     plt.plot(x, net(x), color="red")
+    plt.title("pytorch MLP fits sin ")
     plt.legend(["original","predicted"])
-    plt.savefig("多层感知机线性回归.png",dpi=300)
+    plt.savefig("pytorch_MLP实现.png",dpi=300)
     plt.show()
 
