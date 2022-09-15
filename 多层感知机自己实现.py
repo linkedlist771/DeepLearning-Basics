@@ -74,7 +74,7 @@ class MLP():
         self.b1 = np.zeros(shape=(1, num_hidden)) # 第一层偏置
         self.W2 = np.random.random(size=(num_hidden, num_output))  # 第二层的权重
         self.b2 = np.zeros(shape=(1, num_output)) # 第二层偏置
-        self.activation_function = relu # 定义激活函数
+        self.activation_function = relu  # 定义激活函数
 
     def forward(self, X):
         X = np.reshape(X,(-1, self.num_input))
@@ -93,7 +93,7 @@ class MLP():
         输入推理值
         '''
 
-        H = self.activation_function(np.dot(X, theta[0])+theta[1])#np.array([self.W1, self.b1, self.W2, self.b2])
+        H = self.activation_function(np.dot(X, theta[0])+theta[1])#
         return np.dot(H, theta[2])+theta[3]
 
 
@@ -104,15 +104,17 @@ class MLP():
         ----------
         y:监督值
         y_predict:预测/推理值
++-
+
 
         Returns
         -------
         返回两者的误差,这里采用的MSE误差
         '''
-        return np.sum(np.square(y-y_predict))/len(y)
+        return np.sum(0.5 * (y_predict - y) ** 2)
 
 
-    def get_gradient(self,  X, y, delta=0.01):
+    def get_gradient(self,  X, y, delta=0.00001):
         '''
 
         Parameters
@@ -128,14 +130,35 @@ class MLP():
         '''
 
         theta = np.array([self.W1, self.b1, self.W2, self.b2])
-        delta_theta = np.ones_like(theta)*delta  # 获得形状如X的值
-        step_before = self.loss_function(y, self.predict(X, theta+delta_theta))
-        step_after = self.loss_function(y, self.predict(X, theta-delta_theta))  # 获得差分的分子
-        return (step_before-step_after)/(2*delta_theta)  # 这里存在问题是不是应该取
+        theta_grad = []
+        for index in range(len(theta)):
+            para = theta[index]
+            grad_t = np.zeros(shape=para.shape)  # 获得存储这个梯度的列表
+            for  i  in  range(len(grad_t.flatten())):
+                delta_theta = np.array([np.zeros(shape = self.W1.shape),
+                                        np.zeros(shape = self.b1.shape),
+                                        np.zeros(shape = self.W2.shape),
+                                        np.zeros(shape = self.b2.shape)])  # 获得形状如X的值
+                shape = delta_theta[index].shape
+                #delta_theta = delta_theta.ravel()
+                delta_theta[index] = delta_theta[index].reshape(-1, )
+                #print(delta_theta[index].shape)
+                delta_theta[index][i] = delta
+                delta_theta[index] = delta_theta[index].reshape(shape)
+                step_before = self.loss_function(y, self.predict(X, theta+delta_theta))
+                step_after = self.loss_function(y, self.predict(X, theta-delta_theta))  # 获得差分的分子
+                grad = (step_before-step_after)/(2*delta)  # 这里存在问题是不是应该取
+                #print(grad_t.shape)
+                shape2 = grad_t.shape
+                grad_t = grad_t.reshape(-1, )
+                #print(grad_t.)
+                grad_t[i] = grad
+                grad_t = grad_t.reshape(shape2)
+            theta_grad.append(grad_t)
+        return np.array(theta_grad)
 
 
-
-    def sgd(self, X, y, lr=0.0001):
+    def sgd(self, X, y, lr=0.001):
         '''
         用于做SGD优化的权重以及偏置参数即为__init__
         里面的参数
@@ -158,6 +181,17 @@ class MLP():
         pass
 
 
+    def print_weight(self):
+        print("W1")
+        print(self.W1)
+        print("b1")
+        print(self.b1)
+        print("W2")
+        print(self.W2)
+        print("b2")
+        print(self.b2)
+
+
 
 
 
@@ -169,12 +203,13 @@ if __name__ == '__main__':
     X = np.arange(0, 2*np.pi, 0.1).reshape((-1, num_input))
     y = np.sin(X)*20
     model = MLP(num_input, num_hidden, num_output)
-    epoch = 10000 # 设置100次训练
+    epoch = 100 # 设置100次训练
     for i in range(1,epoch+1):
         model.sgd(X,y)
-        if i%1000==0:
+        if i%10 == 0:
             print(f"第{i}次训练")
             print(f"训练误差{model.loss_function(y,model.forward(X))}")
+            model.print_weight()
             plt.figure()
             plt.scatter(X, y, color="black")
             plt.plot(X, model.forward(X), color="red")

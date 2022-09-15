@@ -1,97 +1,57 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d
-from matplotlib import style
+from matplotlib import pyplot as plt
+
+np.random.seed(100)  # 设置随机数种子
+x = np.linspace(-1, 1, 100).reshape(100, 1)
+y = 3 * np.power(x, 2) + 2 + 0.2 * np.random.rand(x.size).reshape(100, 1)
+plt.scatter(x, y)
+plt.show()
+# 初始化随机参数
+w1 = np.random.rand(1, 1)
+b1 = np.random.rand(1, 1)
+# 训练模型
+lr = 0.001
 
 
-# 构造数据
-def get_data(sample_num=10000):
-    """
-    拟合函数为
-    y = 5*x1 + 7*x2
-    :return:
-    """
-    x1 = np.linspace(0, 9, sample_num)
-    x2 = np.linspace(4, 13, sample_num)
-    x = np.concatenate(([x1], [x2]), axis=0).T
-    y = np.dot(x, np.array([5, 7]).T)
-    return x, y
+def loss_function(y, y_predict):  # real signature unknown; restored from __doc__
+    '''
 
+    Parameters
+    ----------
+    y:监督值
+    y_predict:预测/推理值
 
-# 梯度下降法
-def GD(samples, y, step_size=0.01, max_iter_count=100):
-    """
-    :param samples: 样本
-    :param y: 结果value
-    :param step_size: 每一接迭代的步长
-    :param max_iter_count: 最大的迭代次数
-    :param batch_size: 随机选取的相对于总样本的大小
-    :return:
-    """
-    # 确定样本数量以及变量的个数初始化theta值
-    m, var = samples.shape
-    theta = np.zeros(2)
-    y = y.flatten()
-    # 进入循环内
-    print(samples)
-    loss = 1
-    iter_count = 0
-    iter_list = []
-    loss_list = []
-    theta1 = []
-    theta2 = []
-    # 当损失精度大于0.01且迭代此时小于最大迭代次数时，进行
-    while loss > 0.01 and iter_count < max_iter_count:
-        loss = 0
-        # 梯度计算
-        theta1.append(theta[0])
-        theta2.append(theta[1])
-        for i in range(m):
-            h = np.dot(theta, samples[i].T)
-            # 更新theta的值,需要的参量有：步长，梯度
-            for j in range(len(theta)):
-                theta[j] = theta[j] - step_size * (1 / m) * (h - y[i]) * samples[i, j]
-        # 计算总体的损失精度，等于各个样本损失精度之和
-        for i in range(m):
-            h = np.dot(theta.T, samples[i])
-            # 每组样本点损失的精度
-            every_loss = (1 / (var * m)) * np.power((h - y[i]), 2)
-            loss = loss + every_loss
+    Returns
+    -------
+    返回两者的误差,这里采用的MSE误差
+    '''
+    return np.sum(0.5 * (y_predict - y) ** 2)
+for i in range(800):
+    # 前向传播
+    y_pred = np.power(x, 2) * w1 + b1
+    # loss
+    loss = 0.5 * (y_pred - y) ** 2
+    loss = loss.sum()
+    # 计算梯度
+    #grad_w = np.sum((y_pred - y) * np.power(x, 2))
+    #grad_b = np.sum((y_pred - y))
+    # 使用梯度下降，min loss
+    delta_theta = np.ones_like(w1) * 0.001  # 获得形状如X的值
+    step_before = loss_function(y,(w1+delta_theta)* x**2+b1 )
+    step_after = loss_function(y,(w1-delta_theta)* x**2+b1 )
+    grad_w = (step_before - step_after) / (2 * delta_theta)  # 这里存在问题是不是应该取
 
-        print("iter_count: ", iter_count, "the loss:", loss)
-
-        iter_list.append(iter_count)
-        loss_list.append(loss)
-
-        iter_count += 1
-    plt.plot(iter_list, loss_list)
-    plt.xlabel("iter")
-    plt.ylabel("loss")
-    plt.show()
-    return np.array(theta1), np.array(theta2), np.array(theta), np.array(loss_list)
-
-
-def painter3D(theta1, theta2, loss):
-    style.use('ggplot')
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111, projection='3d')
-    x, y, z = theta1, theta2, loss
-    ax1.plot_wireframe(x.reshape(-1,1), y.reshape(-1,1), z.reshape(-1,1), rstride=5, cstride=5)
-    ax1.set_xlabel("theta1")
-    ax1.set_ylabel("theta2")
-    ax1.set_zlabel("loss")
-    plt.show()
-
-
-def predict(x, theta):
-    y = np.dot(theta, x.T)
-    return y
-
-
-if __name__ == '__main__':
-    samples, y = get_data()
-    theta1, theta2, theta, loss_list = GD(samples, y)
-    print(theta)  # 会很接近[5, 7]
-    painter3D(theta1, theta2, loss_list)
-    predict_y = predict(theta, [7, 8])
-    print(predict_y)
+    delta_theta = np.ones_like(b1) * 0.001  # 获得形状如X的值
+    step_before = loss_function(y,w1* x**2+(b1+delta_theta) )
+    step_after = loss_function(y,w1*x**2+(b1-delta_theta) )
+    grad_b = (step_before - step_after) / (2 * delta_theta)  # 这里存在问题是不是应该取'''
+    w1 -= lr * grad_w
+    b1 -= lr * grad_b
+# 可视化结果
+plt.plot(x, y_pred, 'r-', label='predict')
+plt.scatter(x, y, color='blue', marker='o', label='true')
+plt.xlim(-1, 1)
+plt.ylim(2, 6)
+plt.legend()
+plt.show()
+print(w1, b1)
