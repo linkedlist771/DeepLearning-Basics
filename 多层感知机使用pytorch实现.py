@@ -24,9 +24,9 @@ plt.figure()
 net = MLP()
 x = torch.arange(0, 2*np.pi, 0.1).reshape(-1, 1)
 y = torch.sin(x)#+20+torch.rand(size=(28, 1))*20
-epoch = 20000  # 十次训练次数
-lr = 0.0001  # 学习率
-optimzer = torch.optim.Adam((net.parameters()),lr=lr)#SGD(net.parameters(),lr=lr)  #设置优化器
+epoch = 200000  # 十次训练次数
+lr = 0.00001  # 学习率
+optimzer = torch.optim.Adam((net.parameters()), lr=lr )#SGD(net.parameters(),lr=lr)  #设置优化器
 loss_function = nn.MSELoss()
 
 for i in range(1,epoch+1):

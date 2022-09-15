@@ -56,6 +56,19 @@ def e_relu(X, r=0.01):
     return a
 
 
+def no_activate(X):
+    '''
+
+    Parameters
+    ----------
+    X:输入
+
+    Returns
+    -------
+
+    '''
+    return X
+
 
 class MLP():
     def __init__(self,num_input, num_hidden, num_output):
@@ -74,12 +87,13 @@ class MLP():
         self.b1 = np.zeros(shape=(1, num_hidden)) # 第一层偏置
         self.W2 = np.random.random(size=(num_hidden, num_output))  # 第二层的权重
         self.b2 = np.zeros(shape=(1, num_output)) # 第二层偏置
-        self.activation_function = relu  # 定义激活函数
+        self.theta = np.array([self.W1, self.b1, self.W2, self.b2])
+        self.activation_function = relu # 定义激活函数
 
     def forward(self, X):
         X = np.reshape(X,(-1, self.num_input))
         H = self.activation_function(np.dot(X, self.W1)+self.b1)
-        return np.dot(H, self.W2)+self.b2 # 返回这个值
+        return  np.dot(H, self.W2)+self.b2 # 返回这个值
 
 
     def predict(self, X, theta):
@@ -94,7 +108,7 @@ class MLP():
         '''
 
         H = self.activation_function(np.dot(X, theta[0])+theta[1])#
-        return np.dot(H, theta[2])+theta[3]
+        return  np.dot(H, theta[2])+theta[3]
 
 
     def loss_function(self, y, y_predict):# real signature unknown; restored from __doc__
@@ -114,7 +128,22 @@ class MLP():
         return np.sum(0.5 * (y_predict - y) ** 2)
 
 
-    def get_gradient(self,  X, y, delta=0.00001):
+
+
+
+    def sgd(self, X, y, delta = 0.001 , lr=0.0001):
+        '''
+        用于做SGD优化的权重以及偏置参数即为__init__
+        里面的参数
+        Parameters
+        ----------
+        X: 输入参数
+        y: 监督值
+        lr: 学习率
+        Returns
+        -------
+        无返回值，仅仅优化权重以及偏置参数
+        '''
         '''
 
         Parameters
@@ -129,8 +158,7 @@ class MLP():
         返回梯度
         '''
 
-        theta = np.array([self.W1, self.b1, self.W2, self.b2])
-        theta_grad = []
+        theta = self.theta
         for index in range(len(theta)):
             para = theta[index]
             grad_t = np.zeros(shape=para.shape)  # 获得存储这个梯度的列表
@@ -140,43 +168,16 @@ class MLP():
                                         np.zeros(shape = self.W2.shape),
                                         np.zeros(shape = self.b2.shape)])  # 获得形状如X的值
                 shape = delta_theta[index].shape
-                #delta_theta = delta_theta.ravel()
-                delta_theta[index] = delta_theta[index].reshape(-1, )
-                #print(delta_theta[index].shape)
-                delta_theta[index][i] = delta
-                delta_theta[index] = delta_theta[index].reshape(shape)
+                delta_theta_index = delta_theta[index].ravel()
+                delta_theta_index[i] = delta
+                delta_theta[index] = delta_theta_index.reshape(shape)
                 step_before = self.loss_function(y, self.predict(X, theta+delta_theta))
                 step_after = self.loss_function(y, self.predict(X, theta-delta_theta))  # 获得差分的分子
                 grad = (step_before-step_after)/(2*delta)  # 这里存在问题是不是应该取
-                #print(grad_t.shape)
-                shape2 = grad_t.shape
-                grad_t = grad_t.reshape(-1, )
-                #print(grad_t.)
-                grad_t[i] = grad
-                grad_t = grad_t.reshape(shape2)
-            theta_grad.append(grad_t)
-        return np.array(theta_grad)
-
-
-    def sgd(self, X, y, lr=0.001):
-        '''
-        用于做SGD优化的权重以及偏置参数即为__init__
-        里面的参数
-        Parameters
-        ----------
-        X: 输入参数
-        y: 监督值
-        lr: 学习率
-        Returns
-        -------
-        无返回值，仅仅优化权重以及偏置参数
-        '''
-
-        gradient = self.get_gradient(X, y)
-        self.W1 -= gradient[0]*lr
-        self.b1 -= gradient[1]*lr
-        self.W2 -= gradient[2]*lr
-        self.b2 -= gradient[3]*lr
+                shape = self.theta[index].shape
+                self_theta = self.theta[index].ravel()
+                self_theta[i] -= grad*lr
+                self.theta[index] = self_theta.reshape(shape)
     def train(self):
         pass
 
@@ -195,26 +196,20 @@ class MLP():
 
 
 
-
 if __name__ == '__main__':
     num_input = 1
-    num_hidden = 128
+    num_hidden = 30  # 设置隐藏层个数
     num_output = 1
     X = np.arange(0, 2*np.pi, 0.1).reshape((-1, num_input))
-    y = np.sin(X)*20
+    y =  np.sin(X)
     model = MLP(num_input, num_hidden, num_output)
-    epoch = 100 # 设置100次训练
+    epoch = 100000 # 设置100次训练
     for i in range(1,epoch+1):
-        model.sgd(X,y)
-        if i%10 == 0:
+        model.sgd(X,y,lr=1e-4)
+        if i%20 == 0:
             print(f"第{i}次训练")
             print(f"训练误差{model.loss_function(y,model.forward(X))}")
-            model.print_weight()
-            plt.figure()
-            plt.scatter(X, y, color="black")
-            plt.plot(X, model.forward(X), color="red")
-            plt.title("MLP fits sin by hands")
-            plt.legend(["original", "predicted"])
+
     #print(f"开始的X:\n{X}")
     #print(f"经过MLP前向传播的X:\n{model.forward(X)}")
     plt.scatter(X, y, color="black")
