@@ -1,0 +1,103 @@
+\documentclass{homework}
+\usepackage{ctex}
+\usepackage{amsmath}
+\usepackage{subeqnarray}
+\usepackage{cases}
+\usepackage{booktabs}
+\usepackage{fontspec}
+\usepackage{listings}
+\author{12019311-丁力}
+\class{深度学习基础}
+\date{\today}
+\title{ Homework 1}
+\address{Bayt El-Hikmah}
+
+\graphicspath{{./media/}}
+
+\begin{document} \maketitle
+
+\question 实现正向传播和反向传播的推导
+
+
+在进行证明前，需要先定义一些符号：
+\begin{table}[htbp]
+	\centering 
+	\caption{\label{tab:test}符号说明}
+	\begin{tabular}{lcr}
+		\toprule
+		符号含义 & 含义  \\
+		\midrule
+		$a^{(l)}$ & 第l层经过激活函数激活后的输出 \\
+
+		$a^{(L)}$ & 最后一层输出，这时$y=a^{(L)}$ \\
+		$x$ & 输入数据,并且$x=a^{(0)}$ \\
+		$w_{ij}^{(l)}$ & 权重，l代表第l层，i代表第l层的第i个神经元，
+		j代表第l-1层的第j个神经元 \\
+		$b^{(L)}$ & 第l层的偏置 \\
+		$z^{(l)}$ & 对第l-1层的输出进行仿射变化得到结果，也就是
+		$z^{(l)} =w^{(l)}a^{(l-1)} +b^{(l)} $\\
+		$\delta_{(l)}$ & 第l层的激活函数，并且有$a^{(l)} = 
+		\delta_{(l)}(z^{(l)})$\\
+		$t$ & 输出的监督值 \\
+		$E(y,t)$ & 损失函数 \\
+		$\theta$ & 权重,就是w的总称 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+正向传播和方向传播都是为了求解得到损失函数关于权重以及偏置的梯度，
+采用的都是链式法则。
+\iffalse
+\noindent Rather than finding the shortest path between two points, suppose our car is low on gas, so we want to take the path that uses the least fuel. In the real world, navigation optimized for fuel consumption may take more steps to reach a destination \footnote{\href{https://blog.google/products/maps/3-new-ways-navigate-more-sustainably-maps/}{Google Maps Blog}}. 
+
+Consider the same MDP, but with two new ``efficient actions'' -- move right or move down. For example, starting from state 3, you can either move to state 4 or 9. Once again, the actions are deterministic and always succeed unless you run into a wall. Attempting to move in the direction of a wall from a gray square using an efficient action results in you moving \textit{down} one square. For clarity, we will use separate symbols $r_s$ for the reward associated with an inefficient action (right $\&$ up, or  right $\&$ down) and $r_e$ for the reward associated with an efficient action.
+\fi 
+
+\begin{enumerate}
+	\item  [(a)] 反向传播公式推导：
+	
+	由链式法则，可以得到:
+
+
+	\begin{subequations}  
+		\begin{numcases}{} 
+			\frac{\partial E}{\partial w_{ij}^{(l)}}  = \frac{\partial E}{\partial z^{(l)} }\frac{\partial z^{(l)} }{\partial w_{ij}^{(l)}}           \\
+			\frac{\partial E}{\partial b_{j}^{(l)}}  = \frac{\partial E}{\partial z^{(l)} }\frac{\partial z^{(l)} }{\partial b_{j}^{(l)}}              
+		\end{numcases} 
+	\end{subequations}
+	
+
+
+
+	\item  [(b)] 正向传播公式推导：
+\end{enumerate}
+
+
+\question 对于一个神经网络$y=DNN(x,\theta )$,试求解$\frac{\partial y}{\partial x}$
+
+
+\iffalse 
+
+We proceed by factoring,
+\begin{align*}
+	x^2- 8x - 9     & = 9-9         &  & \text{Subtract 9 on both sides.}         \\
+	x^2- x + 9x - 9 & = 0           &  & \text{Breaking the middle term.}         \\
+	(x - 1)(x + 9)  & = 0           &  & \text{Pulling out common } (x - 1).      \\
+	x               & \in \{1, -9\} &  & f(x)g(x) = 0 \Ra f(x) = 0 \vee g(x) = 0. \\
+\end{align*}
+
+\fig[0.3]{cipher.png, diagram.jpg}{Cipher wheels.}{wheel}
+
+\question Figure \ref{wheel} shows two cipher wheels. The left one is from Jeffrey Hoffstein, et al. \cite{hoffstein2008introduction} (pg. 3). Write a Python 3 program that uses it to encrypt: \texttt{FOUR SCORE AND SEVEN YEARS AGO}.
+
+\lstinputlisting[language=Python, caption={Python 3 implementing figure \ref{wheel} left wheel.}, label=gcd]{code/prog.py}
+
+We get: \texttt{KTZW XHTWJ FSI XJAJS DJFWX FLT}.
+
+\fi 
+
+% citations
+\bibliographystyle{plain}
+\bibliography{citations}
+
+\end{document}
