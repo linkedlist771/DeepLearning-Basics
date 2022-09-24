@@ -76,18 +76,18 @@ class MLP():
         #self.W2 = np.random.random(size=(num_hidden, num_output))  # 第二层的权重
         #self.b2 = np.zeros(shape=(1, num_output)) # 第二层偏置
         #self.theta = np.array([self.W1, self.b1, self.W2, self.b2])
-        self.activation_function = relu # 定义激活函数
+        self.activation_function = relu  # 定义激活函数
         self.params = {}
         self.params['W1'] = np.random.random(size=(num_input, num_hidden))  # 第一层的权重
         self.params['b1'] = np.zeros(shape=(1, num_hidden))  # 第一层偏置
         self.params['W2'] = np.random.random(size=(num_hidden, num_output))  # 第二层的权重
         self.params['b2'] = np.zeros(shape=(1, num_output))  # 第二层偏置
         self.theta = np.array([self.params['W1'], self.params['b1'], self.params['W2'], self.params['b2']], dtype=object)
+
     def forward(self, X):
         X = np.reshape(X,(-1, self.num_input))
         H = self.activation_function(np.dot(X, self.params['W1'])+self.params['b1'])
         return  np.dot(H, self.params['W2'])+ self.params['b2'] # 返回这个值
-
 
     def predict(self, X, theta):
         '''

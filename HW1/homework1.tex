@@ -30,17 +30,22 @@
 		$a^{(l)}$ & 第l层经过激活函数激活后的输出 \\
 
 		$a^{(L)}$ & 最后一层输出，这时$y=a^{(L)}$ \\
-		$x$ & 输入数据,并且$x=a^{(0)}$ \\
+		$x$ & 输入数据,并且$x=a^{(1)}$ \\
 		$w_{ij}^{(l)}$ & 权重，l代表第l层，i代表第l层的第i个神经元，
 		j代表第l-1层的第j个神经元 \\
 		$b^{(L)}$ & 第l层的偏置 \\
 		$z^{(l)}$ & 对第l-1层的输出进行仿射变化得到结果，也就是
 		$z^{(l)} =w^{(l)}a^{(l-1)} +b^{(l)} $\\
-		$\delta_{(l)}$ & 第l层的激活函数，并且有$a^{(l)} = 
-		\delta_{(l)}(z^{(l)})$\\
+		$\sigma_{(l)}$ & 第l层的激活函数，并且有$a^{(l)} = 
+		\sigma_{(l)}(z^{(l)})$\\
+		$\delta^{(l)}_j$ & 损失函数对于
+		第l层第j个加权输出的偏导，也就是$\delta^{(l)}_j= 
+		\frac{\partial E}{\partial z^{(l)}_j}$\\
 		$t$ & 输出的监督值 \\
-		$E(y,t)$ & 损失函数 \\
+		$E(y,t)$ & 损失函数,这里才用L2范数，也就是$E(y,t) = 
+		\frac{\sum_k(y_k-t_k)^2}{2}$ \\
 		$\theta$ & 权重,就是w的总称 \\
+		$L$ & 最后一层的神经网络的层数 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -66,14 +71,216 @@ Consider the same MDP, but with two new ``efficient actions'' -- move right or m
 		\end{numcases} 
 	\end{subequations}
 	
+对于(1a)和(1b)式子，可以化为:
+
+
+\begin{subequations}  
+	\begin{numcases}{} 
+		\frac{\partial E}{\partial w_{ij}^{(l)}}  =\delta^{(l)} \frac{\partial z^{(l)} }{\partial w_{ij}^{(l)}}           \\
+		\frac{\partial E}{\partial b_{j}^{(l)}}  =\delta^{(l)}\frac{\partial z^{(l)} }{\partial b_{j}^{(l)}}              
+	\end{numcases} 
+\end{subequations}
+
+
+所以，也就是求解$\delta^{(l)},\frac{\partial z^{(l)} }{\partial w_{ij}^{(l)}},\frac{\partial z^{(l)} }{\partial b_{j}^{(l)}} $
+这三个变量。
+
+
+对于该神经网络，假设我们使用的激活函数都为同一个激活函数，也就是
+$\sigma = \sigma_{(l)}$ , 为了方便起见，后文中将激活函数写为：
+$\sigma$。
+
+首先先求解$\delta^{(l)}$:
+
+\begin{itemize}
+	\item  求解$\delta^{(l)}$:
+	
+	对于最后一层神经网络，我们从定义中知道：
+	$$a^{(L)} = 
+		\sigma(z^{(L)})$$
+
+	那么对于最后一层:
+	$$\delta^{(L)} = \frac{\partial E}{\partial z^{(L)}}
+	= \frac{\partial 	\frac{\sum_k(y_k-a^{(L)}_k)^2}{2}}{
+		\partial a^{(L)}
+	} \frac{\partial a^{(L)}}{\partial z^{(L)}}$$
+
+	也就是
+	$$\delta^{(L)} =\sum_k(a^{(L)}-y_k) \sigma^\prime (z^{(L)}) $$
+
+   当$1\leq l \leq L-1$时,我们这里采用链式法则来计算
+   ，由于是反向传播，所以我们选择用l+1层的偏导来表示，
+   也就是:
+   $$\delta^{(l)}= 
+   \frac{\partial E}{\partial z^{(l)}}
+   =    \frac{\partial E}{\partial z^{(l+1)}}
+   \frac{\partial z^{(l+1)}}{\partial z^{(l)}} 
+   = \delta^{(l+1)} \frac{\partial z^{(l+1)}}{\partial z^{(l)}}  $$
+   
+   这是一个递推关系式，为了进一步求解，我们需要求解$\frac{\partial z^{(l+1)}}{\partial z^{(l)}} $
+   从定义中可以知道:
+
+   $$z^{(l+1)} =w^{(l+1)}a^{(l)} +b^{(l+1)}
+   = w^{(l+1)}\sigma(z^{(l)}) +b^{(l+1)}$$
+
+   所以有:
+
+   $$\frac{\partial z^{(l+1)}}{\partial z^{(l)}} = 
+   w^{(l+1)}\sigma^\prime (z^{(l)}) $$
+
+   那么这样我们便可以得到$\delta^{(l)}$的表达式为:
+
+   $$\delta^{(l)} = \sigma^\prime (z^{(l)}) (w^{(l+1)})^T
+   \delta^{(l+1)} $$
+
+
+   
+至此我们完成了第一步，也就是
+求解$\delta^{(l)}$
+然后我们求解$\frac{\partial z^{(l)} }{\partial w_{ij}^{(l)}},\frac{\partial z^{(l)} }{\partial b_{j}^{(l)}} $
+这两个即可，便可以完成反向传播的推导。
+
+
+\item 求解$\frac{\partial z^{(l)} }{\partial w_{ij}^{(l)}}$
+
+从定义中可以知道:
+
+$$z^{(l+1)} =w^{(l+1)}a^{(l)} +b^{(l+1)}
+$$
+
+所以有:
+
+
+$$ \frac{\partial z^{(l)} }{\partial w_{ij}^{(l)}} = a^{(l-1)} $$
+
+
+
+
+\item 求解$\frac{\partial z^{(l)} }{\partial b_{j}^{(l)}}$
+
+
+从定义中可以知道:
+
+$$z^{(l+1)} =w^{(l+1)}a^{(l)} +b^{(l+1)}
+$$
+
+所以有:
+
+$$\frac{\partial z^{(l)} }{\partial b_{j}^{(l)}} = 1$$
+
+至此，我们便完成了反向传播的推导，也就是:
+
+
+\begin{subequations}  
+	\begin{numcases}{} 
+		\frac{\partial E}{\partial w_{ij}^{(l)}}  =\delta^{(l)} a^{(l-1)}        \\
+		\frac{\partial E}{\partial b_{j}^{(l)}}  =\delta^{(l)}            \\
+		\mbox{其中}:   \delta^{(l)} = \begin{cases}
+			 \sigma^\prime (z^{(l)}) (w^{(l+1)})^T
+		\delta^{(l+1)} , \qquad l = 1...L-1 \\
+		\sum_k(a^{(L)}-y_k) \sigma^\prime (z^{(L)})  , \qquad l = L
+		\end{cases}
+	\end{numcases} 
+\end{subequations}
+
+
+\end{itemize}
 
 
 
 	\item  [(b)] 正向传播公式推导：
+	
+
+	所谓正向传播，与上面不同的地方仅仅存在于关于$ \delta^{(l)}$
+	求解过程中的链式法则使用上，这里将使用l-1层的偏导来表示，所以被称为正向传播。
+	所以我们只需要改写其中关于$ \delta^{(l)}$的求解部分即可，其他部分与反向传播相同。
+
+	
+\begin{itemize}
+	\item   对于第一层神经网络，我们从定义中知道：
+	$$a^{(1)} = 
+		x$$
+
+	那么对于第一层:
+	$$\delta^{(L)} = \frac{\partial E}{\partial z^{(L)}}
+	= \frac{\partial E}{\partial a^{(L)}}
+	\frac{\partial a^{(L)}}{\partial z^{(L)}} 
+	= \frac{\partial E}{\partial x}
+	\frac{\partial x}{\partial z^{(L)}} $$
+
+	由于x是常数，所以$\frac{\partial x}{\partial z^{(L)}} = 0$也就是:
+
+	$$\delta^{(L)} = 0 $$
+
+   \item  当$2\leq l \leq L$时,我们这里采用链式法则来计算
+   ，由于是正向传播，所以我们选择用l-1层的偏导来表示，
+   也就是:
+   $$\delta^{(l)}= 
+   \frac{\partial E}{\partial z^{(l)}}
+   =    \frac{\partial E}{\partial z^{(l-1)}}
+   \frac{\partial z^{(l-1)}}{\partial z^{(l)}} 
+   = \delta^{(l-1)} \frac{\partial z^{(l-1)}}{\partial z^{(l)}}  $$
+   
+   这是一个递推关系式，为了进一步求解，我们需要求解$\frac{\partial z^{(l+1)}}{\partial z^{(l)}} $
+   从定义中可以知道:
+
+   $$z^{(l+1)} =w^{(l+1)}a^{(l)} +b^{(l+1)}
+   = w^{(l+1)}\sigma(z^{(l)}) +b^{(l+1)}$$
+
+   所以有:
+
+$$  z^{(l-1)} = \sigma^{-1}(\frac{z^{(l)}-b^{(l)}}{w^{(l)}})$$
+
+那么可以得到:
+   $$\frac{\partial z^{(l-1)}}{\partial z^{(l)}} = 
+(\sigma^{-1}(\frac{z^{(l)}-b^{(l)}}{w^{(l)}}))^\prime$$
+
+   那么这样我们便可以得到$\delta^{(l)}$的表达式为:
+
+   $$\delta^{(l)} = 
+   \delta^{(l-1)}(\sigma^{-1}(\frac{z^{(l)}-b^{(l)}}{w^{(l)}}))^\prime $$
+\end{itemize}
+	
 \end{enumerate}
 
+至此，我们便完成了正向传播的推导，也就是:
 
+
+\begin{subequations}  
+	\begin{numcases}{} 
+		\frac{\partial E}{\partial w_{ij}^{(l)}}  =\delta^{(l)} a^{(l-1)}        \\
+		\frac{\partial E}{\partial b_{j}^{(l)}}  =\delta^{(l)}            \\
+		\mbox{其中}:   \delta^{(l)} = \begin{cases}
+			\delta^{(l-1)}(\sigma^{-1}(\frac{z^{(l)}-b^{(l)}}{w^{(l)}}))^\prime  , \qquad l = 2...L \\
+	0 , \qquad l = 1
+		\end{cases}
+	\end{numcases} 
+\end{subequations}
 \question 对于一个神经网络$y=DNN(x,\theta )$,试求解$\frac{\partial y}{\partial x}$
+
+
+从上面，推导过程，不难看出，对于一个n层的神经网络，如果其输出为y，
+那么有:
+
+$$ y = DNN(x,\theta ) = 
+\sigma(w^{(n)}\sigma(w^{(n-1)}\sigma(....)+b^{(n-1)})+b^{(n)})
+$$
+
+
+所以一个神经网络的输出对于其输入的偏导可以表示为:
+$$\frac{\partial y}{\partial x} = 
+\frac{\partial DNN(x,\theta )}{\partial x}
+= \sigma^\prime(z^{(n)}+b)\times w^{(n)} \times 
+\sigma^\prime(z^{(n-1)}+b)\times w^{(n-1)} \times \dots 
+\times \sigma^\prime(w^{(1)}x+b^{(1)})\times w^{(1)}
+$$
+
+或者采用数值求导的方法,令$h$为一个较小的值，
+那么：
+$$\frac{\partial y}{\partial x} = 
+\frac{\partial DNN(x,\theta )}{\partial x}
+= \frac{DNN(x+h,\theta)-DNN(x-h,\theta)}{2h}
+$$
 
 
 \iffalse 
