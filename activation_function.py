@@ -14,6 +14,7 @@ class Sigmoid:
         '''
 
         return 1/(1+np.exp(-self.x))
+
     def backward(self):
         '''
 
@@ -82,3 +83,26 @@ class ERelu:
         a[np.where(a <= 0)] = self.r * np.exp(a[np.where(a <= 0)])
         return a
 
+class Identity:
+    def __init__(self, x):
+        self.x = x
+
+    def forward(self):
+        '''
+
+        Returns
+        -------
+        返回正向计算得到的值
+        '''
+
+        return self.x
+
+    def backward(self):
+        '''
+
+        Returns
+        -------
+        返回sigmoid激活函数的求导后的值
+        '''
+
+        return np.ones_like(self.x)

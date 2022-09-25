@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import traceback
-
-
+import  activation_function as f
+from MLP_network import  *
 def sigmoid(x):
     '''
     sigmoid 激活函数
@@ -47,7 +47,7 @@ def leaky_relu(x, r=0.01):
     return a
 
 
-def e_relu(x, r=0.01):
+def e_relu(x,  r=0.01):
     '''
     LeakyRelu激活函数
     :param x: 输入
@@ -71,19 +71,13 @@ class MLP():
         self.num_input = num_input
         self.num_hidden = num_hidden
         self.num_output = num_output
-        #self.W1 = np.random.random(size=(num_input, num_hidden))  # 第一层的权重
-        #self.b1 = np.zeros(shape=(1, num_hidden)) # 第一层偏置
-        #self.W2 = np.random.random(size=(num_hidden, num_output))  # 第二层的权重
-        #self.b2 = np.zeros(shape=(1, num_output)) # 第二层偏置
-        #self.theta = np.array([self.W1, self.b1, self.W2, self.b2])
-        self.activation_function = relu  # 定义激活函数
-        self.params = {}
+        self.activation_function = sigmoid  # 定义激活函数
+        self.params = dict()
         self.params['W1'] = np.random.random(size=(num_input, num_hidden))  # 第一层的权重
         self.params['b1'] = np.zeros(shape=(1, num_hidden))  # 第一层偏置
         self.params['W2'] = np.random.random(size=(num_hidden, num_output))  # 第二层的权重
         self.params['b2'] = np.zeros(shape=(1, num_output))  # 第二层偏置
         self.theta = np.array([self.params['W1'], self.params['b1'], self.params['W2'], self.params['b2']], dtype=object)
-
     def forward(self, X):
         X = np.reshape(X,(-1, self.num_input))
         H = self.activation_function(np.dot(X, self.params['W1'])+self.params['b1'])
@@ -103,28 +97,71 @@ class MLP():
         H = self.activation_function(np.dot(X, theta[0])+theta[1])#
         return  np.dot(H, theta[2])+theta[3]
 
+    def activate(self, x, w, b, func):
+        '''
 
-    def loss_function(self, y, y_predict):# real signature unknown; restored from __doc__
+        Parameters
+        ----------
+        x:输入x
+        w:输入权重
+        b:输入偏置
+        func:所使用的激活函数的类
+
+        Returns
+        -------
+        输出被激活的输出
+        '''
+
+        return func(np.dot(x, w)+b).forward()
+
+    def loss_function(self, y, y_predict):
         '''
 
         Parameters
         ----------
         y:监督值
         y_predict:预测/推理值
-+-
-
-
         Returns
         -------
         返回两者的误差,这里采用的MSE误差
         '''
         return np.sum(0.5 * (y_predict - y) ** 2)
 
-
-
-
-
-
+    def backward(self, X, Y, lr=0.0001):
+        #前向赋值
+        batch_size = len(X)
+        nabla_w1 = []
+        nabla_b1 = []
+        nabla_w2 = []
+        nabla_b2 = []
+        for x,y in zip(X,Y):
+            a2 = self.activate(x, self.params['W1'], self.params['b1'], f.Relu)
+            a3 = self.activate(a2, self.params['W2'], self.params['b2'], f.Identity)
+            #反向传播
+            delta3 = a3*(1-a3)*(a3-y)
+            delta2 = a2*(1-a2)*np.dot(delta3, self.params['W2'].T)
+            if len(nabla_b1)==0:
+                nabla_w1=np.dot(x.T, delta2)
+                nabla_w2=np.dot(a2.T, delta3)
+                nabla_b1=delta2
+                nabla_b2=delta3
+            else:
+                nabla_w1+=np.dot(x.T, delta2)
+                nabla_w2+=np.dot(a2.T, delta3)
+                nabla_b1+=delta2
+                nabla_b2+=delta3
+        nabla_w1 /= batch_size
+        nabla_w2 /= batch_size
+        nabla_b1 /= batch_size
+        nabla_b2 /= batch_size
+            #梯度下降
+        self.params['W1'] -= lr*nabla_w1
+        self.params['W2'] -= lr*nabla_w2
+        self.params['b1'] -= lr*nabla_b1
+        self.params['b2'] -= lr*nabla_b2
+        self.theta = np.array([self.params['W1'], self.params['b1'], self.params['W2'], self.params['b2']], dtype=object)
+    def train(self, epoch):
+        pass
 
     def sgd(self, X, y, delta = 1e-6 , lr=0.0001):
         '''
@@ -178,9 +215,6 @@ class MLP():
         self.params['W2'] = self.theta[2]
         self.params['b2'] = self.theta[3]
 
-    def train(self):
-        pass
-
     def print_weight(self):
         print("W1")
         print(self.W1)
@@ -204,20 +238,20 @@ class MLP():
                                    self.params['b2']], dtype=object)
 
 
-if __name__ == '__main__':
+def train_with_numeric_sgd():
     num_input = 1
     num_hidden = 30  # 设置隐藏层个数
     num_output = 1
     save_path = "weight.pickle"
-    train_net = False
-    load_weight = True
     # 尝试读取保存的权重
-    X = np.arange(0, 2*np.pi, 0.1).reshape((-1, num_input))
+    X = np.linspace(0, 2 * np.pi, 100).reshape((-1, num_input))
     y = np.sin(X)
     model = MLP(num_input, num_hidden, num_output)
+    train_net = True
+    load_weight = False
     if load_weight:
         try:
-            model.load(save_path) # 尝试读取权重
+            model.load(save_path)  # 尝试读取权重
         except (Exception, BaseException) as e:
             print('{:*^60}'.format('直接打印出e, 输出错误具体原因'))
             print(e)
@@ -229,21 +263,55 @@ if __name__ == '__main__':
     epoch = 1000000  # 设置100次训练
 
     if train_net:
-        for i in range(1, epoch+1):
+        for i in range(1, epoch + 1):
             model.sgd(X, y, lr=1e-4)
             if i % 100 == 0:
                 print(f"第{i}/{epoch}次训练")
-                print(f"训练误差{model.loss_function(y,model.forward(X))}")
+                print(f"训练误差{model.loss_function(y, model.forward(X))}")
                 model.save(save_path)
 
     plt.figure()
-    plt.scatter(X, y, color="black" )
+    plt.scatter(X, y, color="black")
     plt.plot(X, model.forward(X), color="red")
     plt.title("MLP fits sin by hands")
     plt.legend(["original", "predicted"])
     plt.savefig("手动实现_MLP.png", dpi=300)
     plt.show()
 
+def train_with_backward_propagation():
+    # Loading the MNIST data
+    X = np.linspace(0, 2 * np.pi, 100).reshape((-1,1,1))
+    Y = np.sin(X)
+    save_path = "weight_bp.pickle"
+    training_data = list(zip(X, Y))
+    net = Network([1, 30, 1])
+    train_net = True
+    load_weight = True
+    #net.load(save_path)
+    if load_weight:
+        try:
+            net.load(save_path)  # 尝试读取权重
+        except (Exception, BaseException) as e:
+            print('{:*^60}'.format('直接打印出e, 输出错误具体原因'))
+            print(e)
+            print('{:*^60}'.format('使用repr打印出e, 带有错误类型'))
+            print(repr(e))
+            print('{:*^60}'.format('使用traceback的format_exc可以输出错误具体位置'))
+            exstr = traceback.format_exc()
+            print(exstr)
 
+    if train_net:
+        net.SGD(training_data, epochs=100000, mini_batch_size=100000, eta=1e-4, test_data=training_data, save_path=save_path)
+    plt.figure()
+    plt.scatter(np.array(X).flatten(), np.array(Y).flatten() , color="black")
+    predict_y = [net.feedforward(x) for x in  X]
+    #print(predict_y.shape)
+    plt.plot(np.array(X).flatten(), np.array(predict_y).flatten() , color="red")
+    plt.title("MLP fits sin by hands")
+    plt.legend(["original", "predicted"])
+    plt.savefig("手动实现_MLP.png", dpi=300)
+    plt.show()
 
-
+if __name__ == '__main__':
+    #train_with_numeric_sgd()
+    train_with_backward_propagation()
