@@ -6,7 +6,7 @@ This project will include the normal optimization algorithms for the DeepLearnin
 4:Momentum
 5:Neserov
 6:Adam
-All of the codes are written by a material cunt .  
+All of the codes are written by a material cunt .
 """
 import numpy as np
 
@@ -94,6 +94,43 @@ class OptimizationAlgorithm:
 
         return x
 
+    def ada_grad(self, grad_method, lr=1e-9, display_process=False):
+        """
+        Use the adaptive gradient descend method to obtain the optimal solution.
+        For the sumation of the grad will accumulate , so the step for each iteration
+        will approach the 0 . In the end , the iteration will terminate .
+        Parameters
+        ----------
+        grad_method: The method to obtain gradient , by analytical or numerical
+        lr: The learning rate .
+        display_process: whether display the iteration process.
+
+        Returns
+        -------
+        Return the x , where the objective function gets the minimum.
+        """
+        # for the ada grad algorithm , a list to record the history should be maintained
+        grad_list = []
+        x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
+        for i in range(self.epoch):
+            if grad_method == "analytical" and self.has_analytical_grad:
+                # use the analytical method to obtain the gradient
+                grad = self.analytical_grad(x)
+            if grad_method == "numerical":
+                # use the numerical method to obtain the gradient
+                grad = self.numerical_gradient(self.obj_func, x)
+            grad_list.append(grad)
+            # get the accumulative grad
+            gt = np.sum(np.square(np.array(grad_list)))
+            # The Ada grad algorithm is implemented!
+            print(gt)
+            x -= lr*grad/np.square(gt+1e-9)
+            if display_process:
+                if i % 50 == 0:
+                    print(f"epoch: {i}/{self.epoch},  x={x},  f={self.obj_func(x)}")
+
+        return x
+
 
 if __name__ == '__main__':
     obj_func = lambda x: x[0]**2/20+x[1]**2
@@ -102,6 +139,6 @@ if __name__ == '__main__':
     solver = OptimizationAlgorithm(obj_func=obj_func, num_var=2,
                                    lower_bound=[-100, -100], upper_bound=[100, 100],
                                    epoch=1000000, analytical_grad=lambda x: np.array([x[0]/10, 2*x[1]]))
-    optimal_x = solver.gradient_descend(grad_method="analytical", display_process=True)
+    optimal_x = solver.ada_grad(grad_method="analytical", display_process=True)
     print(f"optimal_x:{optimal_x}")
     print(f"minimum function value {obj_func(optimal_x)}")
