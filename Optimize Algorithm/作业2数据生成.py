@@ -9,6 +9,7 @@ This project will include the normal optimization algorithms for the DeepLearnin
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class OptimizationAlgorithm:
@@ -38,7 +39,7 @@ class OptimizationAlgorithm:
             self.has_analytical_grad = False
         if iter_hist:
             self.has_iter_hist = True
-            self.iter_hist = np.array(np.zeros(shape=(self.num_var,)))
+            self.iter_hist = np.array([-7.,2.])
         else :
             self.has_iter_hist = False
 
@@ -85,7 +86,7 @@ class OptimizationAlgorithm:
         -------
         Return the x , where the objective function gets the minimum.
         """
-        x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
+        x = np.array([-7.,2.])
         for i in range(self.epoch):
             if grad_method == "analytical" and self.has_analytical_grad:
                 # use the analytical method to obtain the gradient
@@ -119,7 +120,7 @@ class OptimizationAlgorithm:
         """
         # for the ada grad algorithm , a list to record the history should be maintained
         gt = 0
-        x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
+        x = np.array([-7.,2.])
         for i in range(self.epoch):
             if grad_method == "analytical" and self.has_analytical_grad:
                 # use the analytical method to obtain the gradient
@@ -158,7 +159,7 @@ class OptimizationAlgorithm:
         gt = 0
         beta = 0.9
 
-        x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
+        x = np.array([-7.,2.])
         # self.w = np.array((x[0], x[1]))
         for i in range(self.epoch):
             if grad_method == "analytical" and self.has_analytical_grad:
@@ -193,7 +194,7 @@ class OptimizationAlgorithm:
         -------
         Return the x , where the objective function gets the minimum.
         """
-        x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
+        x = np.array([-7.,2.])
         # the initial velocity
         velocity = np.zeros_like(x)
         momentum_factor = 0.1
@@ -231,7 +232,7 @@ class OptimizationAlgorithm:
         -------
         Return the x , where the objective function gets the minimum.
         """
-        x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
+        x = np.array([-7.,2.])
         # the initial velocity
         velocity = np.zeros_like(x)
         momentum_factor = 0.1
@@ -276,7 +277,7 @@ class OptimizationAlgorithm:
         rho1, rho2 = 0.9, 0.999
         delta = 1e-8
         gt = 0
-        x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
+        x = np.array([-7.,2.])
         # initialize the first moment and the second moment
         s = np.zeros_like(x)
         r = np.zeros_like(x)
@@ -321,11 +322,37 @@ if __name__ == '__main__':
     # solver = OptimizationAlgorithm(obj_func=obj_func, num_var=2, lower_bound=[-100, -100], upper_bound=[100, 100], epoch=1000000)
     # optimal_x = solver.gradient_descend(grad_method="numerical", display_process=True)
     # save the data for each algorithm
+    data_dict = pd.DataFrame({'adam': [], 'gradient_descend': [], 'ada_grad': [], 'momentum': [], 'Nesterov': [], 'rms_prop': []})
     solver = OptimizationAlgorithm(obj_func=obj_func, num_var=2,
-                                   lower_bound=[-100, -100], upper_bound=[100, 100],
+                                   lower_bound=[-7, -7], upper_bound=[7, 7],
                                    epoch=20000, analytical_grad=lambda x: np.array([x[0]/10, 2*x[1]]), iter_hist=True)
     optimal_x = solver.adam(grad_method="numerical", display_process=True)
     solver.draw_process()
+    data_dict["adam"] = [i for i in solver.iter_hist]
+    solver.clear_hist()
+    optimal_x = solver.gradient_descend(grad_method="numerical", display_process=True)
+    solver.draw_process()
+    data_dict["Nesterov"] = [i for i in solver.iter_hist]
+    solver.clear_hist()
+    optimal_x = solver.gradient_descend(grad_method="numerical", display_process=True)
+    solver.draw_process()
+    data_dict["gradient_descend"] = [i for i in solver.iter_hist]
+    solver.clear_hist()
+    optimal_x = solver.ada_grad(grad_method="numerical", display_process=True)
+    data_dict["ada_grad"] = [i for i in solver.iter_hist]
+    solver.draw_process()
+    solver.clear_hist()
+    optimal_x = solver.momentum(grad_method="numerical", display_process=True)
+    data_dict["momentum"] = [i for i in solver.iter_hist]
+    solver.draw_process()
+    solver.clear_hist()
+    optimal_x = solver.rms_prop(grad_method="numerical", display_process=True)
+    data_dict["rms_prop"] = [i for i in solver.iter_hist]
+    solver.draw_process()
+    solver.clear_hist()
+    print(data_dict)
+    data = pd.DataFrame.from_dict(data_dict)
+    data.to_csv("iteration_hist.csv")
     print(f"optimal_x:{optimal_x}")
     print(f"minimum function value {obj_func(optimal_x)}")
     # draw_process(solver.w)
