@@ -12,9 +12,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
-
-
 class OptimizationAlgorithm:
     def __init__(self, obj_func, num_var, lower_bound, upper_bound, epoch, analytical_grad=None):
         """
