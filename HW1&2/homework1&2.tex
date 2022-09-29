@@ -313,13 +313,40 @@ We get: \texttt{KTZW XHTWJ FSI XJAJS DJFWX FLT}.
 	\item 3:RMS prop
 	\item 4:Momentum
 	\item 5:Nesterov
-	\item[]  6:Adam
+	\item  6:Adam
 \end{enumerate}
 
 对于各个算法的实现如下:
 
 \lstinputlisting[language=Python, caption={基于python3对于6中优化算法的实现}, label=gcd]{E:/桌面/深度学习数学基础/DeepLearning-Basics/Optimize Algorithm/optimization_algorithms.py}
 
+
+得到的迭代曲线如下:
+
+\fig[1]{E:/桌面/深度学习数学基础/DeepLearning-Basics/Optimize Algorithm/迭代学习曲线3.png}
+{The iteration curve for the six kinds of optimization algorithms}{wheel}
+
+
+
+从迭代曲线不难看出，adam算法的收敛速度最快，其次的时RMS prop算法，
+然后剩下四种算法速度都比较慢，其中Ada grad最快，剩下的动量法，
+梯度下降以及Nesterov速度基本上一样，都比较慢。
+
+速度较快的算法都是基于Ada grad来实现的，所以速度较快，所以Adam和RMS prop
+算法速度较快，这两个都是基于Ada grad的变种。
+而Nesterov算法实现时是对动量法增加了一个提前一步的迭代，都是基于最基本的
+梯度下降的优化，所以最后的收敛速度都是比较慢的。
+
+
+\question 对于一个隐藏层，输入层，输出层均为100的五层神经网络，
+给予一个满足高斯分布的输入$x\in R^{1000\times 100}$分别讨论
+以下情况的每层输出的分布,并画出直方图：
+\begin{itemize}
+	\item  $\sigma = \begin{cases}
+  sigmoid \\ relu \end{cases}$
+	\item  $\theta = \begin{cases}
+		0 \\   \thicksim N(0, \delta) ,\qquad \delta = 1 \quad or \quad 0.01 \end{cases}$
+\end{itemize}
 
 
 % citations

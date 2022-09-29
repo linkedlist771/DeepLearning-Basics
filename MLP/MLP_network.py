@@ -3,15 +3,18 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import traceback
+from activation_function import *
+
 
 class Network(object):
 
-    def __init__(self, sizes):
+    def __init__(self, sizes, activation_func):
         self.num_layers = len(sizes)
         self.sizes = sizes
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
+        self.activation_func = activation_func
         self.params = dict()
         self.params['num_layers'] = self.num_layers
         self.params['sizes'] = self.sizes
@@ -21,7 +24,12 @@ class Network(object):
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a)+b)
+            if self.activation_func == "sigmoid":
+                a = sigmoid(np.dot(w, a)+b)
+            elif self.activation_func == "relu":
+                a = Relu(np.dot(w, a)+b).forward()
+            else:
+                assert "No activation function is given!"
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
@@ -74,8 +82,13 @@ class Network(object):
             activation = sigmoid(z)
             activations.append(activation)
         # backward pass
-        delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1])
+        if self.activation_func == "sigmoid":
+            delta = self.cost_derivative(activations[-1], y) * \
+                    Sigmoid(zs[-1]).backward()
+        elif self.activation_func == "relu":
+            delta = self.cost_derivative(activations[-1], y) * \
+                    Relu(zs[-1]).backward()
+
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         # Note that the variable l in the loop below is used a little
@@ -86,7 +99,11 @@ class Network(object):
         # that Python can use negative indices in lists.
         for l in range(2, self.num_layers):
             z = zs[-l]
-            sp = sigmoid_prime(z)
+            if self.activation_func == "sigmoid":
+                sp = Sigmoid(z).backward()
+            elif self.activation_func == "relu":
+                sp = Relu(z).backward()
+
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
@@ -126,14 +143,14 @@ def sigmoid_prime(z):
     return sigmoid(z)*(1-sigmoid(z))
 
 
-
 def main():
     # Loading the MNIST data
-    X = np.linspace(0, 2 * np.pi, 100).reshape((-1,1,1))
+    X = np.linspace(0, 2 * np.pi, 1000).reshape((-1,1,1))
     Y = np.sin(X)
     save_path = "weight_bp.pickle"
     training_data = list(zip(X, Y))
-    net = Network([1, 30, 1])
+    lr = 1e-1
+    net = Network([1, 128, 1], activation_func="sigmoid")
     train_net = True
     load_weight = True
     #net.load(save_path)
@@ -150,16 +167,16 @@ def main():
             print(exstr)
 
     if train_net:
-        net.SGD(training_data, 1000000, 100, 0.001 , test_data=training_data, save_path=save_path)
+        net.SGD(training_data, 1000000, 1000, lr, test_data=training_data, save_path=save_path)
     plt.figure()
     plt.scatter(np.array(X).flatten(), np.array(Y).flatten() , color="black")
     predict_y = [net.feedforward(x) for x in  X]
-    #print(predict_y.shape)
     plt.plot(np.array(X).flatten(), np.array(predict_y).flatten() , color="red")
     plt.title("MLP fits sin by hands")
     plt.legend(["original", "predicted"])
     plt.savefig("手动实现_MLP.png", dpi=300)
     plt.show()
+
 
 if __name__ == '__main__':
     main()
