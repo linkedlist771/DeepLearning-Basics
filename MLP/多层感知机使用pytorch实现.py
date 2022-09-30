@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 import  matplotlib.pyplot as plt
+
 class MLP(nn.Module):
     def __init__(self):
         super(MLP, self).__init__()

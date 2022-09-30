@@ -67,7 +67,7 @@ class OptimizationAlgorithm:
             x[idx] = tmp_val - h
             fxh2 = f(x)  # f(x-h)
             grad[idx] = (fxh1 - fxh2) / (2 * h)
-            x[idx] = tmp_val  # 还原值
+            x[idx] = tmp_val
             it.iternext()
 
         return grad

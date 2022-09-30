@@ -1,0 +1,41 @@
+<h2>取值:layer=a1, f=Sigmoid,θ=0, delta=1</h2>
+<img src = 'layer=a1, f=Sigmoid,θ=0, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a2, f=Sigmoid,θ=0, delta=1</h2>
+<img src = 'layer=a2, f=Sigmoid,θ=0, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a3, f=Sigmoid,θ=0, delta=1</h2>
+<img src = 'layer=a3, f=Sigmoid,θ=0, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a4, f=Sigmoid,θ=0, delta=1</h2>
+<img src = 'layer=a4, f=Sigmoid,θ=0, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a5, f=Sigmoid,θ=0, delta=1</h2>
+<img src = 'layer=a5, f=Sigmoid,θ=0, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a1, f=Sigmoid,θ=0, delta=0.01</h2>
+<img src = 'layer=a1, f=Sigmoid,θ=0, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a2, f=Sigmoid,θ=0, delta=0.01</h2>
+<img src = 'layer=a2, f=Sigmoid,θ=0, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a3, f=Sigmoid,θ=0, delta=0.01</h2>
+<img src = 'layer=a3, f=Sigmoid,θ=0, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a4, f=Sigmoid,θ=0, delta=0.01</h2>
+<img src = 'layer=a4, f=Sigmoid,θ=0, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a5, f=Sigmoid,θ=0, delta=0.01</h2>
+<img src = 'layer=a5, f=Sigmoid,θ=0, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a1, f=Sigmoid,θ=normal, delta=1</h2>
+<img src = 'layer=a1, f=Sigmoid,θ=normal, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a2, f=Sigmoid,θ=normal, delta=1</h2>
+<img src = 'layer=a2, f=Sigmoid,θ=normal, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a3, f=Sigmoid,θ=normal, delta=1</h2>
+<img src = 'layer=a3, f=Sigmoid,θ=normal, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a4, f=Sigmoid,θ=normal, delta=1</h2>
+<img src = 'layer=a4, f=Sigmoid,θ=normal, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a5, f=Sigmoid,θ=normal, delta=1</h2>
+<img src = 'layer=a5, f=Sigmoid,θ=normal, delta=1.png'>
+ <br> <br><br><h2>取值:layer=a1, f=Sigmoid,θ=normal, delta=0.01</h2>
+<img src = 'layer=a1, f=Sigmoid,θ=normal, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a2, f=Sigmoid,θ=normal, delta=0.01</h2>
+<img src = 'layer=a2, f=Sigmoid,θ=normal, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a3, f=Sigmoid,θ=normal, delta=0.01</h2>
+<img src = 'layer=a3, f=Sigmoid,θ=normal, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a4, f=Sigmoid,θ=normal, delta=0.01</h2>
+<img src = 'layer=a4, f=Sigmoid,θ=normal, delta=0.01.png'>
+ <br> <br><br><h2>取值:layer=a5, f=Sigmoid,θ=normal, delta=0.01</h2>
+<img src = 'layer=a5, f=Sigmoid,θ=normal, delta=0.01.png'>
+ <br> <br><br>

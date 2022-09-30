@@ -6,7 +6,9 @@
 \usepackage{booktabs}
 \usepackage{fontspec}
 \usepackage{listings}
-\author{12019311-丁力}
+\usepackage{blindtext}
+\usepackage{hyperref}
+%\author{12019311-丁力}
 \class{深度学习基础}
 \date{\today}
 \title{ Homework 1 and 2 }
@@ -348,6 +350,35 @@ We get: \texttt{KTZW XHTWJ FSI XJAJS DJFWX FLT}.
 		0 \\   \thicksim N(0, \delta) ,\qquad \delta = 1 \quad or \quad 0.01 \end{cases}$
 \end{itemize}
 
+
+对神经网络进行初始化，然后进行正向传播，得到不同参数的神经网络的每一个输出层的直方图如下:
+
+由于输出的图片多达40个，所以这里给出图片的链接:
+
+点击这个\href{http://101.132.169.133/nnFeature/}{超链接}查看所有输出图片。
+
+
+从输出的图片的直方图可以看出：
+\begin{enumerate}
+	\item 当$\theta = 0$ 时，由于线性层的
+	权值和偏置都是0，所以不管输入的值是多少进行加权求和以及
+	激活后得到的值都是0。所以此时第1到第5层的输出层都是0。
+
+	\item 当$\theta \thicksim N(0,1)$ 时,也就是其满足标准正态分布时：
+	
+	当激活函数为Sigmoid函数时：
+	第一层$a_1$输出是基本满足单峰正态分布的，$a_2$的输出的分布就发生了部分的偏离。
+	而$a_3，a_4$ 基本满足多峰正态分布，而对于$a_5$层就趋向于均匀分布了。
+
+	当激活函数为Relu函数时： 对于所有的输出层，直方图中输出分布都是0值较多，
+	其他值的数量都较少。
+
+	而$\delta$影响的就是分布的方差，也就是分布的范围，当$\delta$较大时($\delta=1$)
+	分布更广。
+
+	\item 对于上述情况，应该是Relu函数对于小于0的输入输出为0所以导致了大部分的输出都是0，
+	而Sigmoid对于正负的输入都可以激活，这里面的由于是标准正态分布，所以还没达到Sigmoid函数的饱和区。
+\end{enumerate}
 
 % citations
 \bibliographystyle{plain}
