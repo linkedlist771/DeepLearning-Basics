@@ -9,7 +9,7 @@ def init_params(nn, distribution,delta = 1.0):
     nn = nn
     if distribution=="noraml":
         nn.weight.data.normal_(0.0, delta)
-        nn.bias.data.normal_(0.0, delta)
+        nn.bias.data.fill_(0)
     elif distribution=="0":
         nn.weight.data.fill_(0)
         nn.bias.data.fill_(0)
@@ -21,7 +21,7 @@ def init_params(nn, distribution,delta = 1.0):
 class MLP(nn.Module):
     def __init__(self, distribution, delta):
         super(MLP, self).__init__()
-        self.activation_func = nn.ReLU()
+        self.activation_func = nn.Sigmoid()
         self.layer1_theta = init_params(nn.Linear(100, 100), distribution, delta)
         self.layer2_theta = init_params(nn.Linear(100, 100), distribution, delta)
         self.layer3_theta = init_params(nn.Linear(100, 100), distribution, delta)
@@ -101,13 +101,13 @@ def plot_hist(x, name,text):
 
     # 保存图片
     plt.savefig(f"{name}.png")
-    #plt.show()
+    plt.show()
     return text
 
 if __name__ == "__main__":
     text = ""
-    activate_func = "Relu"
-    for theta in ["0", "normal"]:
+    activate_func = "Sigmoid"
+    for theta in ["normal", "0"]:
         for delta in [1, 0.01]:
             x = torch.normal(mean=0, std=1, size=(1000, 100))
             net = MLP(theta, delta = delta)

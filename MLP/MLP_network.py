@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import traceback
 from activation_function import *
+import math
+math.erf()
 
 
 class Network(object):
@@ -61,6 +63,18 @@ class Network(object):
             else:
                 assert "No activation function is given!"
         return a
+
+    def predict(self, a, bias, weights):
+        """Return the output of the network if ``a`` is input."""
+        for b, w in zip(bias, weights):
+            if self.activation_func == "sigmoid":
+                a = sigmoid(np.dot(w, a)+b)
+            elif self.activation_func == "relu":
+                a = Relu(np.dot(w, a)+b).forward()
+            else:
+                assert "No activation function is given!"
+        return a
+
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None, save_path = None):
@@ -139,6 +153,13 @@ class Network(object):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
+    def numerical_grad(self, x, y):
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        biases = np.array(self.biases)
+        weights = np.array(self.weights)
+        # feedforward
+        pass #OK 决定了，就学CMU的课
 
     def evaluate(self, test_data):
         test_results = [(0.5*(self.feedforward(x))-y)**2
