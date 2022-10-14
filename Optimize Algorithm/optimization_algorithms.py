@@ -275,7 +275,6 @@ class OptimizationAlgorithm:
         # the declining rate for the moment estimation
         rho1, rho2 = 0.9, 0.999
         delta = 1e-8
-        gt = 0
         x = np.random.uniform(low=self.lower_bound, high=self.upper_bound)
         # initialize the first moment and the second moment
         s = np.zeros_like(x)
