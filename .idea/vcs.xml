@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/CMU DeepLearning Course/HW1/hw1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/CMU DeepLearning Course/hw3" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/MLP/mlp-classifier/PracticalDeepLearningTutorials" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Reinforcement Learning/Hands-on-RL" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Reinforcement Learning/Hands-on-RL/multiagent-particle-envs" vcs="Git" />

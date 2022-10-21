@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$APPLICATION_CONFIG_DIR$/projects/workspace/.idea/workspace.iml" filepath="$APPLICATION_CONFIG_DIR$/projects/workspace/.idea/workspace.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../毕业设计/.idea/毕业设计.iml" filepath="$PROJECT_DIR$/../../毕业设计/.idea/毕业设计.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/深度学习数学基础.iml" filepath="$PROJECT_DIR$/.idea/深度学习数学基础.iml" />
     </modules>
   </component>

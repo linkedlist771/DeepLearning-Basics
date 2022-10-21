@@ -9,9 +9,13 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.module = nn.Sequential(
                         nn.Flatten(),
-                        nn.Linear(1, 128),
+                        nn.Linear(1, 512),
                         nn.ReLU(),
-                        nn.Linear(128, 1))
+                        nn.Linear(512, 128),
+                        nn.ReLU(),
+                        nn.Linear(128, 64),
+                        nn.ReLU(),
+                        nn.Linear(64, 1))
 
     def forward(self, x):
         x = self.module(x)
@@ -23,32 +27,39 @@ plt.figure()
 
 
 # 这里实现一个线性回归
+#  设置设备
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# 把数据移动到cuda上
 net = MLP()
-x = torch.arange(0, 2*np.pi, 0.1).reshape(-1, 1)
+net = net.to(device)
+x = torch.arange(0, 20*np.pi, 0.01).reshape(-1, 1)
+x = x.to(device)
 y = torch.sin(x)#+20+torch.rand(size=(28, 1))*20
-epoch = 200000  # 十次训练次数
-lr = 0.00001  # 学习率
-optimzer = torch.optim.Adam((net.parameters()), lr=lr )#SGD(net.parameters(),lr=lr)  #设置优化器
+y = y.to(device)
+epoch = 400000  # 十次训练次数
+lr = 0.01  # 学习率
+optimizer = torch.optim.Adam((net.parameters()), lr=lr )#SGD(net.parameters(),lr=lr)  #设置优化器
 loss_function = nn.MSELoss()
+train_net = False
+load_weight = True
 
-for i in range(1,epoch+1):
+if load_weight:
+    net.load_state_dict(torch.load('线性回归.pth'), strict=True)
 
-    output = net(x)
-    loss = loss_function(output,y)
-    optimzer.zero_grad()  #梯度清0
-    loss.backward()
-    optimzer.step()
-    if i%100==0:
-      print(f"第{i}次训练")
-      print(f"训练误差{loss.item()}")
+if train_net:
+  for i in range(1,epoch+1):
+  
+      output = net(x)
+      loss = loss_function(output,y)
+      optimizer.zero_grad()  #梯度清0
+      loss.backward()
+      optimizer.step()
+      if i%100==0:
+        for p in optimizer.param_groups:
+            p['lr'] *= 0.9#注意这里
+        print(f"第{i}次训练")
+        print(f"训练误差{loss.item()}")
+  
+  torch.save(net.state_dict(),"线性回归.pth")
 
-torch.save(net.state_dict(),"线性回归.pth")
-
-with torch.no_grad():
-    plt.scatter(x, y, color="black")
-    plt.plot(x, net(x), color="red")
-    plt.title("pytorch MLP fits sin ")
-    plt.legend(["original","predicted"])
-    plt.savefig("pytorch_MLP实现.png",dpi=300)
-    plt.show()
 

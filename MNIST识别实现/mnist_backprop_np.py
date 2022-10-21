@@ -187,7 +187,6 @@ class Network:
     def backprop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
-
         # 1. forward
         activation = x
         # w*x = z => sigmoid => x/activation
@@ -202,9 +201,7 @@ class Network:
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
-
         loss = np.power(activations[-1]-y, 2).sum()
-
         # 2. backward
         # (Ok-tk)*(1-Ok)*Ok
         # [10] - [10] * [10]
@@ -273,12 +270,12 @@ def main():
     np.random.seed(66)
     save_path = "Mnist_weight_bp.pickle"
     model = Network([784, 64, 10])
-    load_weight = True
+    load_weight = False
     if load_weight:
         model.load(save_path)
     data_train = list(zip(x_train, y_train))
     data_test = list(zip(x_test, y_test))
-    model.SGD(training_data=data_train, epochs=10, mini_batch_size=128, eta=1e-3, test_data=data_test,
+    model.SGD(training_data=data_train, epochs=10000000, mini_batch_size=128, eta=1e-4, test_data=data_test,
               save_path=save_path)
 
 
