@@ -4,8 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import traceback
 from activation_function import *
-import math
-math.erf()
 
 
 class Network(object):
@@ -196,14 +194,14 @@ def sigmoid_prime(z):
 
 def main():
     # Loading the MNIST data
-    X = np.linspace(0, 2 * np.pi, 1000).reshape((-1,1,1))
+    X = np.linspace(0, 2 * np.pi, 100).reshape((-1,1,1))
     Y = np.sin(X)
     save_path = "weight_bp.pickle"
     training_data = list(zip(X, Y))
-    lr = 1e-4
-    net = Network([1, 128, 1], activation_func="sigmoid")
+    lr = 1e-0
+    net = Network([1, 128, 1], activation_func="relu")
     train_net = True
-    load_weight = False
+    load_weight = True
     #net.load(save_path)
     if load_weight:
         try:
@@ -218,7 +216,7 @@ def main():
             print(exstr)
 
     if train_net:
-        net.SGD(training_data, 1000000, 1000, lr, test_data=training_data, save_path=save_path)
+        net.SGD(training_data, epochs=1000000, mini_batch_size=1000, eta=lr, test_data=training_data, save_path=save_path)
     plt.figure()
     plt.scatter(np.array(X).flatten(), np.array(Y).flatten() , color="black")
     predict_y = [net.feedforward(x) for x in  X]
