@@ -43,15 +43,20 @@ test_images = torch.Tensor(test_images)
 test_labels = torch.Tensor(test_labels)
 # 构建神经网络
 model = MyNeuralNetWork()
+# 默认方法
+for m in model.modules():
+    if isinstance(m, (nn.Conv2d, nn.Linear)):
+        nn.init.zeros_(m.weight)
+
 # 创建损失函数
 loss_function = nn.CrossEntropyLoss()
 # 优化器
-learning_rate = 1e-3
+learning_rate = 1e-2
 # 调整学习率
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 # 记录训练次数
 total_train_step = 0
-epoch = 20
+epoch = 100
 total_test_step = 0
 # 每次取出的图片数量
 batch_size = 128
@@ -109,5 +114,13 @@ for i in range(1, epoch+1):
         print(f"Best Params saved!, accuracy:{accuracy / len(test_images) * 100}%")
     print(f"在整体测试集上的Loss:{total_loss}")
     print(f"在整体测试集上的正确率:{accuracy/len(test_images)*100}%")
+    with open("single_layer_pytorch_sgd.txt", "a") as f:
+        if i-1 == 0:
+            f.write("epoch train_loss test_loss  accuracy\n")
+            f.write(f"{loss}  {total_loss} {accuracy/len(test_images)}\n")
+        else:
+            f.write(f"{loss}  {total_loss} {accuracy/len(test_images)}\n")
     total_test_step += 1
     print()
+
+#%%

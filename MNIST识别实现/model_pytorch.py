@@ -7,11 +7,10 @@ class MyNeuralNetWork(nn.Module):
         super(MyNeuralNetWork, self).__init__()
         self.module = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(784, 512),
-            nn.ReLU(),
-            nn.Linear(512, 256),
-            nn.ReLU(),
-            nn.Linear(256, 10),
+            nn.Linear(784, 64),
+            nn.Sigmoid(),
+            nn.Linear(64, 10),
+            nn.Softmax()
 
         )
         """ 
