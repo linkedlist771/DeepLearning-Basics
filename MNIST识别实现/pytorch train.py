@@ -46,12 +46,12 @@ model = MyNeuralNetWork()
 # 默认方法
 for m in model.modules():
     if isinstance(m, (nn.Conv2d, nn.Linear)):
-        nn.init.zeros_(m.weight)
+        nn.init.kaiming_normal_(m.weight, a=0, mode='fan_in', nonlinearity='sigmoid')
 
 # 创建损失函数
 loss_function = nn.CrossEntropyLoss()
 # 优化器
-learning_rate = 1e-2
+learning_rate = 1e-3
 # 调整学习率
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 # 记录训练次数
@@ -65,7 +65,11 @@ n_test = len(test_images)
 # 设定最佳的epoch
 maximum_accuracy = 0
 best_params = model.state_dict()
-for i in range(1, epoch+1):
+
+import time
+
+start = time.perf_counter()
+for i in range(0, epoch):
     print(f"-----第{i}轮训练开始-----")
     for batch_index in range(0, n_train, batch_size):
         lower_range = batch_index
@@ -114,13 +118,17 @@ for i in range(1, epoch+1):
         print(f"Best Params saved!, accuracy:{accuracy / len(test_images) * 100}%")
     print(f"在整体测试集上的Loss:{total_loss}")
     print(f"在整体测试集上的正确率:{accuracy/len(test_images)*100}%")
-    with open("single_layer_pytorch_sgd.txt", "a") as f:
-        if i-1 == 0:
+    with open("pytoch_sgd_time_cost.txt", "a") as f:
+        if i == 0:
             f.write("epoch train_loss test_loss  accuracy\n")
             f.write(f"{loss}  {total_loss} {accuracy/len(test_images)}\n")
         else:
             f.write(f"{loss}  {total_loss} {accuracy/len(test_images)}\n")
     total_test_step += 1
     print()
+end = time.perf_counter()
+print (f"用时{end-start}s")
+#CPU: sgd 用时 70.1359013s, adam 用时 96.4111973s
+#GPU: sgd:25.13273179437965s  adam用时34.931137181818485s
 
 #%%
